@@ -1,9 +1,7 @@
-<script lang="ts" setup>
-
-</script>
+<script lang="ts" setup></script>
 
 <template>
   <div>
-    <h1><PageFactionSelect S=""</h1>
+    <h1>Page Faction Select</h1>
   </div>
 </template>
