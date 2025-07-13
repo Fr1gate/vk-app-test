@@ -1,6 +1,8 @@
 import bridge from "@vkontakte/vk-bridge";
 
 export async function vkInit() {
+  bridge.send("VKWebAppInit");
+
   bridge.subscribe((event) => {
     if (!event.detail) {
       return;
