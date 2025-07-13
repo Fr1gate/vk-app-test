@@ -8,6 +8,8 @@ export async function vkInit() {
       return;
     }
 
+    console.log("GOT VK EVENT", event);
+
     switch (event.detail.type) {
       case "VKWebAppOpenCodeReaderResult": {
         if (event.detail.data) {
