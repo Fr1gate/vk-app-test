@@ -1,10 +1,12 @@
 import bridge from "@vkontakte/vk-bridge";
+import { auth } from "@/services/auth/auth.ts";
 
 export async function vkInit() {
+  console.log("VK INIT START");
+  const params = new URLSearchParams(window.location.search);
+  console.log("URL params", params);
+
   bridge.send("VKWebAppInit").then(() => console.log("App init sent"));
-  bridge
-    .send("VKWebAppGetLaunchParams")
-    .then(() => console.log("App launch params request sent"));
 
   bridge.subscribe((event) => {
     if (!event.detail) {
@@ -14,20 +16,25 @@ export async function vkInit() {
     console.log("GOT VK EVENT", event);
 
     switch (event.detail.type) {
-      case "VKWebAppOpenCodeReaderResult": {
-        if (event.detail.data) {
-          // Обработка события в случае успеха
-          return event.detail.data;
+      case "VKWebAppInitResult": {
+        if (event.detail.data.result) {
+          bridge.send("VKWebAppGetLaunchParams");
         } else {
           // Ошибка
-          console.error(event.detail);
+          console.error("app did not launch properly", event.detail);
           return;
         }
+        break;
       }
-      case "VKWebAppOpenCodeReaderFailed": {
-        // Обработка события в случае ошибки
-        console.error(event.detail);
-        return;
+      case "VKWebAppGetLaunchParamsResult": {
+        // auth
+        auth(event.detail.data.vk_user_id);
+
+        break;
+      }
+      case "VKWebAppGetLaunchParamsFailed": {
+        console.error("Launch params failed", event);
+        break;
       }
     }
   });
