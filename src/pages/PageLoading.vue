@@ -1,36 +1,14 @@
 <template>
   <div class="loading-page">
     <div>Loading...</div>
-    <div>
-      <img src="@/assets/hlebushek.jpg" alt="HOMA - HLEBUSHEK" height="500" />
-    </div>
-    <div>
-      <img
-        src="@/assets/hamster_archer.jpg"
-        alt="HOMA - HLEBUSHEK"
-        height="500"
-      />
-    </div>
-    <div>
-      <img
-        src="@/assets/hamster_doctor.jpg"
-        alt="HOMA - HLEBUSHEK"
-        height="500"
-      />
-    </div>
-    <div>
-      <img
-        src="@/assets/hamster_worker.jpg"
-        alt="HOMA - HLEBUSHEK"
-        height="500"
-      />
-    </div>
+    <div>web server url: {{ serverURL }}</div>
   </div>
-  <!--    <LiquidGlassOnCursor />-->
 </template>
 
 <script setup lang="ts">
-// import LiquidGlassOnCursor from "@/components/LiquidGlassOnCursor.vue";
+import { ref } from "vue";
+
+const serverURL = ref<string>(import.meta.env.VITE_SERVER_URL);
 </script>
 
 <style lang="scss">

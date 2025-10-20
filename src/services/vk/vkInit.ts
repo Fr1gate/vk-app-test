@@ -1,41 +1,46 @@
 import bridge from "@vkontakte/vk-bridge";
 import { auth } from "@/services/auth/auth.ts";
 
+/**
+ *
+ * @returns true if user is registered, false otherwise
+ */
 export async function vkInit() {
-  console.log("VK INIT START");
-  const params = new URLSearchParams(window.location.search);
-  console.log("URL params", params);
+  return new Promise((resolve) => {
+    bridge.send("VKWebAppInit");
 
-  bridge.send("VKWebAppInit").then(() => console.log("App init sent"));
+    bridge.subscribe((event) => {
+      if (!event.detail) {
+        return;
+      }
 
-  bridge.subscribe((event) => {
-    if (!event.detail) {
-      return;
-    }
+      console.log("GOT VK EVENT", event);
 
-    console.log("GOT VK EVENT", event);
-
-    switch (event.detail.type) {
-      case "VKWebAppInitResult": {
-        if (event.detail.data.result) {
-          bridge.send("VKWebAppGetLaunchParams");
-        } else {
-          // Ошибка
-          console.error("app did not launch properly", event.detail);
-          return;
+      switch (event.detail.type) {
+        case "VKWebAppInitResult": {
+          if (event.detail.data.result) {
+            bridge.send("VKWebAppGetLaunchParams");
+          } else {
+            // Ошибка
+            console.error("app did not launch properly", event.detail);
+            return;
+          }
+          break;
         }
-        break;
-      }
-      case "VKWebAppGetLaunchParamsResult": {
-        // auth
-        auth(event.detail.data.vk_user_id);
+        case "VKWebAppGetLaunchParamsResult": {
+          // auth
+          const vkParams = event.detail.data;
+          auth(vkParams).then((isRegistered) => {
+            resolve(isRegistered);
+          });
 
-        break;
+          break;
+        }
+        case "VKWebAppGetLaunchParamsFailed": {
+          console.error("Launch params failed", event);
+          break;
+        }
       }
-      case "VKWebAppGetLaunchParamsFailed": {
-        console.error("Launch params failed", event);
-        break;
-      }
-    }
+    });
   });
 }
